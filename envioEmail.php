@@ -1,5 +1,7 @@
 <?php
 
+include ".env";
+
 /* FORM DATA ./index.html */ 
 $nome = $_POST['nome'];
 $email = $_POST['email'];
@@ -21,14 +23,28 @@ if (!$connection) {
 }
  
 /* Database Recording */
-$record = "INSERT INTO envios(nome, email, assunto, mensagem) VALUES ('$nome', '$email', '$assunto', '$mensagem')";
+$record = "INSERT INTO envios(nome, email, assunto, mensagem) VALUES ('{$nome}', '{$email}', '{$assunto}', '{$mensagem}')";
 if (mysqli_query($connection, $record)) {
       echo "Gravado com Sucesso no Banco de Dados!";
 } else {
       echo "Error: " . $record . "<br>" . mysqli_error($connection);
+      exit;
 }
-mysqli_close($connection);
 
+// $lastId = mysqli_insert_id($connection);
+
+// $query = "SELECT * FROM envios WHERE id = {$lastId}";
+// $data = mysqli_query($connection, $query);
+
+// echo "<br><br>";
+
+// while ($info = mysqli_fetch_array($data)) {
+//     $nomeUsuario = $info['nome'];
+// }
+// echo $nomeUsuario;
+// exit;
+
+mysqli_close($connection);
 
 /* SENDING THE EMAIL */
 include 'vendor/autoload.php';
@@ -42,12 +58,12 @@ $mail = new PHPMailer(true); // Instancia a classe e cria um objeto
 try {
     //Server settings
     $mail->isSMTP();
-    $mail->SMTPDebug  = "smtp.gmail.com";
-    $mail->Host       = 'localhost';
-    $mail->Port       = 3306;
+    $mail->SMTPDebug  = SMTP::DEBUG_LOWLEVEL;
+    $mail->Host       = "smtp.gmail.com";
+    $mail->Port       = 465; // Encriptacao
     $mail->SMTPAuth   = true;
-    $mail->Username   = 'root';
-    $mail->Password   = '';
+    $mail->Username   = 'davipenso@gmail.com';
+    $mail->Password   = '[sua_senha_do_email]';
     
     //Recipients
     $mail->setFrom("davipenso@gmail.com");
@@ -77,6 +93,3 @@ try {
 } catch (Exception $e) {
     echo "A mensagem não pôde ser enviada. Erro: {$mail->ErrorInfo}";
 }
-
-
-?>
